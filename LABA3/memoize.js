@@ -2,17 +2,23 @@ function memoize(fn, options = {}) {
   const cache = new Map();
   const maxSize = options.maxSize || Infinity;
   const policy = options.policy || 'lru';
-
+  const ttl = options.ttl || null; 
+  
   return function (...args) {
     const key = JSON.stringify(args);
+    const now = Date.now();
     if (cache.has(key)) {
       const entry = cache.get(key);
-      entry.count += 1; 
-      if (policy === 'lru') {
+      if (ttl && (now - entry.timestamp > ttl)) {
         cache.delete(key);
-        cache.set(key, entry);
+      } else {
+        entry.count += 1;
+        if (policy === 'lru') {
+          cache.delete(key);
+          cache.set(key, entry);
+        }
+        return entry.result;
       }
-      return entry.result;
     }
     const result = fn(...args);
     if (cache.size >= maxSize) {
@@ -31,7 +37,7 @@ function memoize(fn, options = {}) {
         cache.delete(lfuKey);
       }
     }
-    cache.set(key, { result, count: 1 });
+    cache.set(key, { result, count: 1, timestamp: now });
     return result;
   };
 }
