@@ -2,17 +2,18 @@ function memoize(fn, options = {}) {
   const cache = new Map();
   const maxSize = options.maxSize || Infinity;
   const policy = options.policy || 'lru';
-  const ttl = options.ttl || null; 
-  
+  const ttl = options.ttl || null;
+
   return function (...args) {
     const key = JSON.stringify(args);
     const now = Date.now();
+
     if (cache.has(key)) {
-      const entry = cache.get(key);
+      const entry = cache.get(key); 
       if (ttl && (now - entry.timestamp > ttl)) {
-        cache.delete(key);
+        cache.delete(key); 
       } else {
-        entry.count += 1;
+        entry.count += 1; 
         if (policy === 'lru') {
           cache.delete(key);
           cache.set(key, entry);
@@ -21,8 +22,13 @@ function memoize(fn, options = {}) {
       }
     }
     const result = fn(...args);
+
     if (cache.size >= maxSize) {
-      if (policy === 'lru') {
+      if (typeof policy === 'function') {
+ 
+        const keyToRemove = policy(cache);
+        if (keyToRemove) cache.delete(keyToRemove);
+      } else if (policy === 'lru') {
         const oldestKey = cache.keys().next().value;
         cache.delete(oldestKey);
       } else if (policy === 'lfu') {
@@ -34,10 +40,18 @@ function memoize(fn, options = {}) {
             lfuKey = k;
           }
         }
-        cache.delete(lfuKey);
+        if (lfuKey) cache.delete(lfuKey);
       }
     }
+
     cache.set(key, { result, count: 1, timestamp: now });
     return result;
   };
 }
+const slowAdd = (a, b) => {
+  return a + b;
+};
+
+const memoizedAdd = memoize(slowAdd, { maxSize: 2, policy: 'lru' });
+console.log(memoizedAdd(1, 2)); 
+console.log(memoizedAdd(1, 2)); 
