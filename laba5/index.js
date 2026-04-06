@@ -8,7 +8,6 @@ function asyncMapCallback(array, iteratee, finalCallback) {
   array.forEach((item, index) => {
     iteratee(item, (err, result) => {
       if (hasError) return; 
-
       if (err) {
         hasError = true;
         return finalCallback(err, null);
@@ -37,3 +36,13 @@ asyncMapCallback(
     else console.log("Callback results:", results);
   }
 );
+
+function asyncMapPromise(array, iteratee) {
+  return new Promise((resolve, reject) => {
+    const promises = array.map(item => iteratee(item));
+    
+    Promise.all(promises)
+      .then(results => resolve(results))
+      .catch(error => reject(error));
+  });
+}
