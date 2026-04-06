@@ -23,3 +23,17 @@ function asyncMapCallback(array, iteratee, finalCallback) {
     });
   });
 }
+
+console.log("Callback Demo");
+const data1 = [1, 2, 3];
+
+asyncMapCallback(
+  data1,
+  (item, cb) => {
+    setTimeout(() => cb(null, item * 2), 500); 
+  },
+  (err, results) => {
+    if (err) console.error("Error:", err);
+    else console.log("Callback results:", results);
+  }
+);
