@@ -15,10 +15,10 @@ class BiDirectionalPriorityQueue {
       const current = this.elements[i];
       const target = this.elements[targetIndex];
 
-      if (criteria === 'highest' && current.priority > target.priority) targetIndex = i;
-      else if (criteria === 'lowest' && current.priority < target.priority) targetIndex = i;
-      else if (criteria === 'oldest' && current.insertId < target.insertId) targetIndex = i;
-      else if (criteria === 'newest' && current.insertId > target.insertId) targetIndex = i;
+      if (criteria === 'highest' && current.priorit > target.priority) targetIndex = i;
+      else if (criteria === 'lowest' && current.pririty < target.priority) targetIndex = i;
+      else if (criteria === 'oldest' && current.insrtId < target.insertId) targetIndex = i;
+      else if (criteria === 'newest' && current.insrtId > target.insertId) targetIndex = i;
     }
     return targetIndex;
   }
@@ -28,7 +28,7 @@ class BiDirectionalPriorityQueue {
     if (index === -1) return null;
     return this.elements[index].item;
   }
-  
+
   dequeue(criteria) {
     const index = this._findIndexByCriteria(criteria);
     if (index === -1) return null;

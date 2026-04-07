@@ -46,3 +46,18 @@ function asyncMapPromise(array, iteratee) {
       .catch(error => reject(error));
   });
 }
+async function runAsyncAwaitDemo() {
+  console.log("\nAsync/Await Demo");
+  const data2 = [10, 20, 30];
+
+  try {
+    const results = await asyncMapPromise(data2, async (item) => {
+      return new Promise(resolve => setTimeout(() => resolve(item * 2), 500));
+    });
+    console.log("Async/Await results:", results); 
+  } catch (err) {
+    console.error("Async/Await error:", err);
+  }
+}
+
+setTimeout(runAsyncAwaitDemo, 1000);
