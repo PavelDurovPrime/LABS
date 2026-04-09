@@ -61,3 +61,30 @@ async function runAsyncAwaitDemo() {
 }
 
 setTimeout(runAsyncAwaitDemo, 1000);
+
+function asyncMapAbortable(array, iteratee, options = {}) {
+  return new Promise((resolve, reject) => {
+    const signal = options.signal;
+
+    if (signal && signal.aborted) {
+      return reject(new Error('cancelled before starting'));
+    }
+
+    const onAbort = () => reject(new Error('Operation was aborted'));
+    if (signal) {
+      signal.addEventListener('abort', onAbort);
+    }
+
+    const promises = array.map(item => iteratee(item));
+
+    Promise.all(promises)
+      .then(results => {
+        if (signal) signal.removeEventListener('abort', onAbort); 
+        resolve(results);
+      })
+      .catch(err => {
+        if (signal) signal.removeEventListener('abort', onAbort);
+        reject(err);
+      });
+  });
+}
